@@ -1,0 +1,41 @@
+---
+title: "McDonalds"
+author: "Mauricio Moreno"
+date: "2023-03-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE, warning=FALSE}
+library(leaflet)
+library(tidyverse)
+library(readxl)
+library(writexl)
+library(dplyr)
+```
+
+```{r}
+#load in data
+mc <- read.csv("Data/menu.csv")
+
+price <- read.csv("Data/prices.csv")
+
+no_brekky <- mc %>%
+  filter(mc$Category != "Breakfast")
+
+no_brekky_small_bev <- no_brekky[!grepl("Small", no_brekky$Item), ]
+no_brekky_large_bev <- no_brekky_small_bev[!grepl("Large", no_brekky_small_bev$Item), ]
+no_brekky_child_bev <- no_brekky_large_bev[!grepl("Child", no_brekky_large_bev$Item), ]
+no_brekky_kids_bev <- no_brekky_child_bev[!grepl("Kids", no_brekky_child_bev$Item), ]
+no_brekky_snack_bev <- no_brekky_kids_bev[!grepl("Snack", no_brekky_kids_bev$Item), ]
+
+df <- no_brekky_snack_bev
+
+df$Item <- gsub("\\(Medium\\)", "", df$Item)
+
+df <- left_join(df, price, by = "Item")
+```
+
